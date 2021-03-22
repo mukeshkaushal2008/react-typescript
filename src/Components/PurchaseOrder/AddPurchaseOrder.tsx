@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useDispatch, useSelector, connect } from 'react-redux';
 import Layout from '../../Layouts/Layout';
 import { getOrderDetail, getProductDetail, createOrder, getClinics } from '../../Actions/PurchaseOrderAction';
@@ -8,8 +8,10 @@ import AddSupplierModal from './AddSupplierModal';
 import { Spinner, Button } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import { success, error } from '../../Utils/Toaster';
+import { UserContext } from "../../Hooks/UserContext";
 
 const AddPurchaseOrder: React.FC = (): JSX.Element => {
+  const userContext = useContext(UserContext);
   const payloadState = (): any => {
     return {
       supplier_id: '',
@@ -117,9 +119,8 @@ const AddPurchaseOrder: React.FC = (): JSX.Element => {
       if (response.payload.response && response.payload.response.data.status != 200) {
         setFormSubmitLoader(false);
         error(response.payload.response.data.message);
-        console.log('Compoent error', response)
+        console.log('Component error', response)
       }
-
     }
   }, [response]);
 

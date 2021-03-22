@@ -1,11 +1,13 @@
 import axios from "axios";
 import { Dispatch } from "redux";
+import { setToken, getToken } from '../Middlewares/Auth';
+
 const apiUrl = `https://test.aestheticrecord.com/backend/api/`;
 
 // Add a request interceptor
 axios.interceptors.request.use(
   config => {
-    config.headers.common["access-token"] = "a51d615958a0cb4c11c7336ce0809c17";
+    config.headers.common["access-token"] = getToken();
     config.headers.common["Content-Type"] = "application/json";
     return config;
   },

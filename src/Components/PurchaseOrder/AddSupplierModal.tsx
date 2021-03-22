@@ -112,8 +112,6 @@ const AddSupplierModal = (props: any): JSX.Element => {
           <Modal.Title id="contained-modal-title-vcenter">
             Add Supplier
            
-            {JSON.stringify(payload)}
-           
         </Modal.Title>
         </Modal.Header>
         <Modal.Body className="show-grid">

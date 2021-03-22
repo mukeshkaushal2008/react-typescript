@@ -11,14 +11,14 @@ interface PublicRouteProps extends RouteProps {
     restricted?: boolean;
 }
 
-const PublicRoute = (props: PublicRouteProps): JSX.Element => {
+const PublicRoute: React.FC<PublicRouteProps> = (props): JSX.Element => {
     const { component: Component, exact, path, restricted, ...rest } = props;
     return (
         <Route
             {...rest}
             render={(routeProps): JSX.Element =>
                 isLogin() && restricted ? (
-                    <Redirect to="/dashboard" />
+                    <Redirect to="/users" />
                 ) : (
                     <Component {...props} />
                 )

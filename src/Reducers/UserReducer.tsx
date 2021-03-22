@@ -16,6 +16,18 @@ const UserReducer = (state = {}, action: any) => {
         payload: action.payload,
         action: "LOGIN",
       };
+    case 'LOGOUT':
+      return {
+        payload: action.payload,
+        action: "LOGOUT",
+      };
+
+    case 'CREATE_USER':
+      return {
+        payload: action.payload,
+        action: "CREATE_USER",
+      };
+
     default:
       return state;
   }

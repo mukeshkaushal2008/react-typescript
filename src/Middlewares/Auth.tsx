@@ -1,23 +1,18 @@
 // LOGOUT
-export const logout = () => {
-  localStorage.removeItem('auth')
-  //message.success('Logout Success')
+export const clearToken = () => {
+  localStorage.removeItem('access_token')
 }
 
 // LOGIN STATUS
-export const isLogin = () => {
-  if (localStorage.getItem('auth')) return true;
+export const isLogin = (): boolean => {
+  if (localStorage.getItem('access_token')) return true;
   return false;
 }
 
 // LOGIN
-export const login = (props:any, d:any) => {
-  if (d.username === 'user' && d.password === 'password') {
-      localStorage.setItem('auth', d)
-      props.history.push('/home');
-      //message.success('Login Success')
-  }
-  else {
-     // message.error('Login Failed')
-  }
+export const setToken = (token: string) => {
+  localStorage.setItem('access_token', token);
+}
+export const getToken = (): any => {
+  return (localStorage.getItem('access_token') !== undefined) ? localStorage.getItem('access_token') : '';
 }

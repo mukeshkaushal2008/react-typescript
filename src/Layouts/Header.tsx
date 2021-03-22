@@ -1,18 +1,50 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Navbar } from 'react-bootstrap'
 //import { logout, isLogin } from '../Middleware/Auth';
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
-
+import {  Link, NavLink } from "react-router-dom";
+import { UserContext } from "../Hooks/UserContext";
+import { useHistory } from "react-router-dom";
+import { logout } from '../Actions/UserAction';
+import { LoginModel, AuthModel } from '../Models/Auth';
+import { useDispatch, useSelector, connect } from 'react-redux';
+import { AppState } from '../Store';
+import { success, error } from '../Utils/Toaster';
+import {clearToken } from  '../Middlewares/Auth';
+import NavBar from  '../Layouts/NavBar';
 const Header: React.FC = (props): JSX.Element => {
-    const [state, setState] = useState(false)
+    const dispatch = useDispatch();
+    let history = useHistory();  // declare here, inside a React component. 
+
+    const [isLoggedIn, setIsLoggedIn] = useState<string>('');
+    const userContext: any = useContext(UserContext);
+    const response: any = useSelector((state: AppState) => state.UserReducer);
+
 
     // useEffect(() => setState(isLogin()), [props])
-
-    const handleLogout = () => {
-        // logout();
-        // setState(false)
+    useEffect(() => {
+        console.log(userContext.isLoggedIn);
+        setIsLoggedIn(userContext.isLoggedIn);
+    }, []);
+    const handleLogout = (): void => {
+        dispatch(logout());
     }
+    useEffect((): void => {
+        if (response && response.payload && response.payload.status == 200) {
+            if (response.action == "LOGOUT") {
+                clearToken();
+                success('You are logged out successfully');     
+                history.push("/");         
+            }
+        }
 
+        if (response && response.payload && response.payload.isAxiosError) {
+            if (response.payload.response && response.payload.response.data.status != 200) {
+              error(response.payload.response.data.message);
+              console.log('Component error', response)
+            }
+          }
+
+      }, [response]);
     return (
         <header>
 
@@ -23,18 +55,13 @@ const Header: React.FC = (props): JSX.Element => {
                 </button>
                 <div className="collapse navbar-collapse" id="navbarCollapse">
                     <ul className="navbar-nav mr-auto">
-                        <li className="nav-item active">
-                            <Link className="nav-link" to="/" >Login</Link>
-                        </li>
-
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/create-order" >Add Order</Link>
-                        </li>
+                        <NavBar/>
                     </ul>
-                    <form className="form-inline mt-2 mt-md-0">
+                    {/* <form className="form-inline mt-2 mt-md-0">
                         <input className="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" />
                         <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                    </form>
+                    </form> */}
+                    {isLoggedIn && <button onClick={handleLogout} className="btn btn-outline-success my-2 my-sm-0" type="button">Logout</button>}
                 </div>
             </nav>
         </header>

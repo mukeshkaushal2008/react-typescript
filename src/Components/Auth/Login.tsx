@@ -1,22 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useDispatch, useSelector, connect } from 'react-redux';
+import React, { useState, useEffect, useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Layout from '../../Layouts/Layout';
 import { Spinner, Button } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import { success, error } from '../../Utils/Toaster';
 import { login } from '../../Actions/UserAction';
-import { LoginModel } from '../../Models/Auth';
+import { LoginModel, AuthModel } from '../../Models/Auth';
 import { AppState } from '../../Store';
+import { useHistory } from "react-router-dom";
+import { setToken, getToken } from '../../Middlewares/Auth';
+import { UserContext } from "../../Hooks/UserContext";
 
-const Login = (): JSX.Element => {
+const Login: React.FC = (props): JSX.Element => {
+  const userContext = useContext(UserContext);
 
   const userInititalState = (): LoginModel => {
     return {
       email: '',
-      password: ''
+      password: '',
+      is_need: 1
     }
   }
   const dispatch = useDispatch();
+  const [loggedinUser, setLoggedinUser] = useState<AuthModel>({
+    access_token: ''
+  });
+
   const [user, setUser] = useState(userInititalState());
   const [submitted, setSubmitted] = useState(false);
   const [formErrors, setFormErrors] = useState<any>({});
@@ -24,7 +33,9 @@ const Login = (): JSX.Element => {
   const [formSubmitLoader, setFormSubmitLoader] = useState<boolean>(false);
 
   const response: any = useSelector((state: AppState) => state.UserReducer);
+  let history = useHistory();  // declare here, inside a React component. 
 
+  
 
   const handleSubmit = (e: any): void => {
     e.preventDefault();
@@ -32,6 +43,7 @@ const Login = (): JSX.Element => {
     
     setFormErrors(err.errors);
     setCanSubmitForm(err.canSubmitForm);
+    
   }
 
   const handleChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -40,9 +52,10 @@ const Login = (): JSX.Element => {
 
   useEffect((): void => {
     if (canSubmitForm == true) {
-      console.log('Dispatch Send');
+      setFormSubmitLoader(true);
       dispatch(login(user));
       setCanSubmitForm(false);
+      
     }
   }, [canSubmitForm]);
   const validate = (values: LoginModel): {} => {
@@ -61,12 +74,13 @@ const Login = (): JSX.Element => {
   };
 
   useEffect((): void => {
-    //console.log('Payload From Server', response );
     if (response && response.payload && response.payload.status == 200) {
-      if (response.action == "CREATE_ORDER") {
+      if (response.action == "LOGIN") {
         setUser(userInititalState());
+        setLoggedinUser(getToken());
         setFormSubmitLoader(false);
         success('You are loggedin successfully');
+        history.push("/create-order");
       }
     }
     if (response && response.payload && response.payload.isAxiosError) {
@@ -83,8 +97,6 @@ const Login = (): JSX.Element => {
       <ToastContainer />
       <div className="col-lg-8 offset-lg-2">
         <h2>Login</h2>
-      {JSON.stringify(formErrors)}
-      {JSON.stringify(canSubmitForm)}
       
         <form name="form" onSubmit={handleSubmit}>
 

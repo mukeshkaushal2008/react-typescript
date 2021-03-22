@@ -1,169 +1,232 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import { useDispatch, useSelector, connect } from 'react-redux';
-import Layout from '../../Layouts/Layout';
-import { InterfaceUserData, InterfaceUserResponse, InterfaceUserState } from '../../Models/Users';
+import React, { useState, useEffect, useReducer } from 'react';
 import { getUsers } from '../../Actions/UserAction';
-import { AppState } from '../../Store';
-import { bindActionCreators, Dispatch } from 'redux';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
+import { connect, useDispatch, useSelector } from 'react-redux';
 import Loader from "react-loader-spinner";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import InfiniteScroll from 'react-infinite-scroll-component';
-// https://www.freecodecamp.org/news/redux-thunk-explained-with-examples/
-// https://github.com/piotrwitek/react-redux-typescript-guide
+import Layout from '../../Layouts/Layout';
+import { ToastContainer, toast } from 'react-toastify';
+import { success, error } from '../../Utils/Toaster';
+import { AppState } from '../../Store';
+import { Spinner } from 'react-bootstrap';
+import CreateEditUser from './CreateEditUser';
 
-const Users: React.FC = (): JSX.Element => {
+// import CreateUser from './CreateUser';
+const Users = (props: any): JSX.Element => {
   const dispatch = useDispatch();
   const response: any = useSelector((state: AppState) => state.UserReducer);
-  const [state, setState] = useState<InterfaceUserData[]>([]);
-  const [payload, setPayload] = useState<any>({
+  const userInititalState = {
     term: '',
-    role_id: null
-  });
-
+    letter_key: ''
+  };
+  const [loading, setLoading] = useState<boolean>(false);
+  const [payload, setPayload] = useState(userInititalState);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [allLetters, setAllLetters] = useState<any[]>([]);
   const [page, setPage] = useState<number>(0);
   const [perPage, setPerPage] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [nextPageUrl, setNextPageUrl] = useState<string | null>(null);
-  const [status, setStatus] = useState<string>('Active');
-  const [roleId, setRoleId] = useState<string>('');
+  const [nextPageUrl, setNextPageUrl] = useState(null);
+  const [modalShow, setModalShow] = useState<boolean>(false);
 
-  useEffect((): void => {
-    let formData: InterfaceUserState = {
-      page: 1,
-      pagesize: 10
+  // Set Initial data
+  useEffect(() => {
+    let formData = {
+      page: 1, pagesize: 20
     }
+    setLoading(true);
     dispatch(getUsers(formData));
-  }, [])
+  }, []);
 
-  useEffect((): void => {
-
+  // Set Pagination Data
+  useEffect(() => {
     if (response && response.payload && response.payload.status == 200) {
-      console.log('State is ', response)
-      setState(response.payload.data.data);
-      setCurrentPage(response.payload.data.current_page);
-      setNextPageUrl(response.payload.data.next_page_url);
-      setPerPage(response.payload.data.per_page);
-    }
-    if (response && response.payload && (!response.payload.status || response.payload.status != 200)) {
-      console.log('Compoent error', response.payload.status, response.payload.message)
-    }
-  }, [response.payload])
 
-  const handleChange = (e: React.FormEvent<HTMLInputElement | HTMLSelectElement>): void => {
-    const { name, value } = e.currentTarget;
-    setPayload((payload: any) => ({ ...payload, [name]: value }));
-  }
-  const handleSubmit = (e: React.SyntheticEvent) => {
+      const { current_page, data, next_page_url, per_page, total, active_letters } = response.payload.data;
+      setAllLetters(active_letters);
+      setCurrentPage(current_page);
+      setNextPageUrl(next_page_url);
+      setPerPage(per_page);
+      //setTotal(total);
+      if (current_page == 1) {
+        console.log('Frrst Page');
+        setAllUsers(data);
+      }
+      else {
+        console.log('Send Page');
+        setAllUsers([...allUsers, ...data]);
+      }
+      setLoading(false);
+    }
+    if (response && response.payload && response.payload.isAxiosError) {
+      setLoading(false);
+      if (response.payload.response && response.payload.response.data.status != 200) {
+        error(response.payload.response.data.message);
+      }
+    }
+  }, [response]);
+
+  // Submit Form
+  const handleSubmit = (e: any) => {
     e.preventDefault();
-    let formData: InterfaceUserState = {
+    let formData = {
       page: 1,
-      pagesize: 10,
-      sortby: 'firstname',
-      sortorder: 'ASC',
-      term: (payload.term != undefined) ? payload.term : '',
-      status: status,
+      pagesize: 20,
+      term: payload.term,
+      letter_key: payload.letter_key
     }
-    if (payload.role_id && payload.role_id != undefined) {
-      formData.role_id = (payload.role_id != undefined) ? payload.role_id : '';
-    }
+    setLoading(true);
     dispatch(getUsers(formData));
   }
-  const handleClick = (status: string): void => {
-    let formData: InterfaceUserState = {
-      page: 1,
-      pagesize: 10,
-      sortby: 'firstname',
-      sortorder: 'ASC',
-      status: status,
 
-    }
-    if (payload.role_id && payload.role_id != undefined) {
-      formData.role_id = (payload.role_id != undefined) ? payload.role_id : '';
-    }
-    setStatus(status);
-    dispatch(getUsers(formData));
+  // Set payload on change of inputs
+  const handleChange = (e: any) => {
+    console.log('onchange applied')
+    const { name, value } = e.target;
+    setPayload(payload => ({ ...payload, [name]: value }));
   }
+
+  //Load more scrolled
+  const loadMore = () => {
+    let page: any = currentPage + 1;
+    setPage(parseInt(page));
+  }
+
+  //Get data on when scrolled
+  useEffect(() => {
+    if (page && page > 1) {
+      console.log('Get next page ', page)
+      let formData = {
+        page: page,
+        pagesize: perPage,
+        term: payload.term,
+        letter_key: payload.letter_key
+      }
+      console.log('Get next page payload ', formData)
+      dispatch(getUsers(formData));
+    }
+  }, [page]);
   return (
     <Layout>
-      {JSON.stringify(status)}
-      <div className="setting-setion">
-        <form className="form-inline" onSubmit={handleSubmit}>
-          <div className="form-group mb-2">
-            <label onClick={() => handleClick('Active')} className={`btn btn-${status == 'Active' ? 'primary' : 'default'}`}>Active</label>
-            <label onClick={() => handleClick('Inactive')} className={`mr-2 btn btn-${status == 'Inactive' ? 'primary' : 'default'}`}>Inactive</label>
-          </div>
-          <div className="form-group mx-sm-3 mb-2">
-            <label className="sr-only">Search</label>
-            <input type="text" name="term" value={payload.term} onChange={handleChange} className="form-control" id="inputPassword2" placeholder="Search" />
-          </div>
-          <div className="form-group mx-sm-3 mb-2">
-            <select className="form-control" name="role_id" onChange={handleChange}>
-              <option value="">All roles</option>
-              <option value="1">Admin</option>
-              <option value="2">Provider</option>
-              <option value="3">Front Desk</option>
-              <option value="4">Medical Director</option>
-            </select>
-          </div>
-          <button type="submit" className="btn btn-primary mb-2">Submit</button>
-        </form>
+      <CreateEditUser show={modalShow} onHide={() => setModalShow(false)} />
+
+      <ToastContainer />
+      <div >
+        {/* <h3>Users: <CreateUser/></h3> */}
+        <>
+          {JSON.stringify(payload)}
+          {loading && <Loader
+            type="Puff"
+            color="#00BFFF"
+            height={100}
+            width={100}
+            timeout={1000} //3 secs
+          />}
+          <form onSubmit={handleSubmit}>
+            <div className="row mb-3">
+              <div className="col">
+                <input className="form-control " type="text"
+                  placeholder="Search..."
+                  name="term" value={payload.term} onChange={handleChange}
+                />
+              </div>
+              <div className="col">
+                <select name="letter_key" onChange={handleChange} className={'form-control'}>
+                  <option value="">Select Alphabat</option>
+                  {
+                    allLetters && allLetters.map((val, index) => (
+                      <option key={index} value={val}>{val}</option>
+                    ))
+                  }
+
+                </select>
+              </div>
+              <div className="col text-right">
+                <button disabled={(loading) ? true : false} type="submit" className="btn btn-secondary btn-search mr-3" >
+                  {loading && <Spinner animation="border" size="sm" />}
+                  {(loading) ? 'Processing' : 'Submit'}
+                </button>
+                <button type="button" className="btn btn-primary"
+                  onClick={(event): void => {
+                    setModalShow(true)
+                  }}
+                >
+                  Create User
+                </button>
+              </div>
+            </div>
+          </form>
 
 
-        {/* {perPage} {currentPage} {nextPageUrl} */}
-        <table className="table">
-          <thead className="thead-dark">
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">First</th>
-              <th scope="col">Last</th>
-              <th scope="col">Email</th>
-            </tr>
-          </thead>
-          <tbody>
-            {state.length > 0 ? state.map((user, index) => (
-              <tr key={index}>
-                <th scope="row">{user.id}</th>
-                <td>{user.firstname}</td>
-                <td>{user.lastname}</td>
-                <td>{user.email_id}</td>
+        </>
 
-              </tr>
-            )) : <React.Fragment><tr><th colSpan={4}>No data found</th></tr></React.Fragment>}
-
-
-          </tbody>
-        </table>
-
-        <div>
-          <ul>
+        {
+          <InfiniteScroll
+            dataLength={currentPage}
+            next={loadMore}
+            hasMore={(nextPageUrl == null) ? false : true}
+            loader={loading && <h4>Loading...</h4>}
+            scrollThreshold={0.9}
+          >
+            <table className='table table-bordered'>
+              <thead>
+                <tr>
+                  <th scope='col'>#</th>
+                  <th scope='col'>Id</th>
+                  <th scope='col'>First Name</th>
+                  <th scope='col'>Last Name</th>
+                  <th scope='col'>Email</th>
+                  <th scope='col'>Action</th>
+                </tr>
+              </thead>
+              <tbody>
 
 
-          </ul>
-        </div>
+                {allUsers && allUsers.length > 0 ? (
+                  allUsers.map((user, index) => (
+
+                    <tr
+                      key={index + 1}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <th scope='row'>{index}</th>
+                      <td>{user.id}</td>
+                      <td>{user.firstname}</td>
+                      <td>{user.lastname}</td>
+                      <td>{user.email}</td>
+                      <td className="text-right">
+                        <button type="button" className="btn btn-primary mr-3" >
+                          Edit
+                      </button>
+
+                        <button type="button" className="btn btn-danger" >
+                          Delete
+                      </button>
+                      </td>
+
+
+                    </tr>
+                  ))
+
+                ) : (
+                  <tr>
+                    <td colSpan={6} style={{ textAlign: 'center' }}>
+                      No tasks found
+                    </td>
+                  </tr>
+                )}
+
+
+
+              </tbody>
+
+            </table>
+          </InfiniteScroll>
+        }
+
       </div>
     </Layout>
-
-  )
+  );
 }
-
-/*const mapStateToProps = (state: any) => {
-  const response = {};
-  console.log('State is', state);
-
-  return response;
-}
-const mapDispatchToProps = (dispatch: Dispatch) => ({
-        ...bindActionCreators(
-          {
-            getUsers
-          },
-          dispatch,
-        )
-      })
-
-export default connect(mapStateToProps, mapDispatchToProps)(Users);*/
 
 export default Users;

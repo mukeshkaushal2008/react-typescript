@@ -12,8 +12,9 @@ interface PrivateRouteProps extends RouteProps {
     path: string;
 }
 
-const PrivateRoute = (props: PrivateRouteProps): JSX.Element => {
+const PrivateRoute: React.FC<PrivateRouteProps> = (props): JSX.Element => {
     const { component: Component, exact,path, ...rest } = props;
+  
     return (
         <Route
             {...rest}
