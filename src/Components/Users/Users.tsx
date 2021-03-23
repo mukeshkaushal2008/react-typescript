@@ -28,7 +28,8 @@ const Users = (props: any): JSX.Element => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [nextPageUrl, setNextPageUrl] = useState(null);
   const [modalShow, setModalShow] = useState<boolean>(false);
-
+  const [userId, setUserId] = useState<number>(0);
+  
   // Set Initial data
   useEffect(() => {
     let formData = {
@@ -41,20 +42,19 @@ const Users = (props: any): JSX.Element => {
   // Set Pagination Data
   useEffect(() => {
     if (response && response.payload && response.payload.status == 200) {
-
-      const { current_page, data, next_page_url, per_page, total, active_letters } = response.payload.data;
-      setAllLetters(active_letters);
-      setCurrentPage(current_page);
-      setNextPageUrl(next_page_url);
-      setPerPage(per_page);
-      //setTotal(total);
-      if (current_page == 1) {
-        console.log('Frrst Page');
-        setAllUsers(data);
-      }
-      else {
-        console.log('Send Page');
-        setAllUsers([...allUsers, ...data]);
+      if (response.action == "USER_GET") {
+        const { current_page, data, next_page_url, per_page, total, active_letters } = response.payload.data;
+        setAllLetters(active_letters);
+        setCurrentPage(current_page);
+        setNextPageUrl(next_page_url);
+        setPerPage(per_page);
+        //setTotal(total);
+        if (current_page == 1) {
+          setAllUsers(data);
+        }
+        else {
+          setAllUsers([...allUsers, ...data]);
+        }
       }
       setLoading(false);
     }
@@ -106,9 +106,23 @@ const Users = (props: any): JSX.Element => {
       dispatch(getUsers(formData));
     }
   }, [page]);
+
+  const onAdd = () => {
+    setModalShow(false);
+    let formData = {
+      page: 1, pagesize: 20
+    }
+    setLoading(true);
+    dispatch(getUsers(formData));
+  }
+
+  const editUser = (id: number) => {
+    setUserId(id);
+    setModalShow(true);
+  }
   return (
     <Layout>
-      <CreateEditUser show={modalShow} onHide={() => setModalShow(false)} />
+      <CreateEditUser id={userId}  onAdd={onAdd} show={modalShow} onHide={() => setModalShow(false)} />
 
       <ToastContainer />
       <div >
@@ -195,7 +209,7 @@ const Users = (props: any): JSX.Element => {
                       <td>{user.lastname}</td>
                       <td>{user.email}</td>
                       <td className="text-right">
-                        <button type="button" className="btn btn-primary mr-3" >
+                        <button onClick={() => editUser(user.id)} type="button" className="btn btn-primary mr-3" >
                           Edit
                       </button>
 

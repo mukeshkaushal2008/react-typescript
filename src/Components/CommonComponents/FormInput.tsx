@@ -9,6 +9,7 @@ export interface FormInputProps {
   error?: string;
   label?: string;
   style?: string;
+  checked?: boolean;
 }
 
 
@@ -32,6 +33,8 @@ const FormInput = (props: FormInputProps): JSX.Element => {
         onChange={props.onChange}
         value={props.value}
         className={formClass}
+        checked={props.checked}
+
       />
       {props.error && (
         <span className="error">{props.error}</span>

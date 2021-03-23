@@ -43,10 +43,10 @@ export const getUsers = (formData: any) => {
   return async (dispatch: Dispatch) => {
     try {
       const res = await axios.get(`${apiUrl}clients?${objectToQuery(formData)}&scopes=cardOnFiles,patientInsurence`);
-      dispatch({ type: "LOGIN", payload: res });
+      dispatch({ type: "USER_GET", payload: res });
       return res;
     } catch (error) {
-      dispatch({ type: "LOGIN", payload: error })
+      dispatch({ type: "USER_GET", payload: error })
     }
   }
 }
@@ -72,6 +72,31 @@ export const createUser = (formData: any) => {
       return res;
     } catch (error) {
       dispatch({ type: "CREATE_USER", payload: error })
+    }
+  }
+}
+export const editUser = (formData: any) => {
+  return async (dispatch: Dispatch) => {
+    
+    try {
+      const res = await axios.patch(`${apiUrl}clients/`, formData);
+      dispatch({ type: "EDIT_USER", payload: res });
+      return res;
+    } catch (error) {
+      dispatch({ type: "EDIT_USER", payload: error })
+    }
+  }
+}
+
+export const getUserDetail = (formData: any) => {
+  return async (dispatch: Dispatch) => {
+    
+    try {
+      const res = await axios.get(`${apiUrl}clients/${formData}?scopes=cardOnFiles,patientInsurence`);
+      dispatch({ type: "GET_USER_DETAIL", payload: res });
+      return res;
+    } catch (error) {
+      dispatch({ type: "GET_USER_DETAIL", payload: error })
     }
   }
 }
