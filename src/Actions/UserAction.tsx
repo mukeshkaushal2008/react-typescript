@@ -75,11 +75,11 @@ export const createUser = (formData: any) => {
     }
   }
 }
-export const editUser = (formData: any) => {
+export const editUser = (formData: any, userId:number) => {
   return async (dispatch: Dispatch) => {
     
     try {
-      const res = await axios.patch(`${apiUrl}clients/`, formData);
+      const res = await axios.patch(`${apiUrl}clients/${userId}`, formData);
       dispatch({ type: "EDIT_USER", payload: res });
       return res;
     } catch (error) {
@@ -97,6 +97,19 @@ export const getUserDetail = (formData: any) => {
       return res;
     } catch (error) {
       dispatch({ type: "GET_USER_DETAIL", payload: error })
+    }
+  }
+}
+
+export const deleteUser = (userId:number) => {
+  return async (dispatch: Dispatch) => {
+    
+    try {
+      const res = await axios.delete(`${apiUrl}clients/${userId}`);
+      dispatch({ type: "DELETE_USER", payload: res });
+      return res;
+    } catch (error) {
+      dispatch({ type: "DELETE_USER", payload: error })
     }
   }
 }

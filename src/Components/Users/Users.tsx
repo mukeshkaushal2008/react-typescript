@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { getUsers } from '../../Actions/UserAction';
+import { getUsers , deleteUser} from '../../Actions/UserAction';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import Loader from "react-loader-spinner";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
@@ -40,7 +40,7 @@ const Users = (props: any): JSX.Element => {
   }, []);
 
   // Set Pagination Data
-  useEffect(() => {
+  useEffect((): void => {
     if (response && response.payload && response.payload.status == 200) {
       if (response.action == "USER_GET") {
         const { current_page, data, next_page_url, per_page, total, active_letters } = response.payload.data;
@@ -56,6 +56,11 @@ const Users = (props: any): JSX.Element => {
           setAllUsers([...allUsers, ...data]);
         }
       }
+      if (response.action == "DELETE_USER") {
+        success('User Deleted Successfully');
+        onAdd();
+      }
+
       setLoading(false);
     }
     if (response && response.payload && response.payload.isAxiosError) {
@@ -119,6 +124,15 @@ const Users = (props: any): JSX.Element => {
   const editUser = (id: number) => {
     setUserId(id);
     setModalShow(true);
+  }
+  const deleteUserById = (id: number): void => {
+    if(window.confirm("Are you sue want to delete this user?")){
+      console.log('Yes');
+      dispatch(deleteUser(id));
+    }
+    else{
+      console.log('No');
+    }
   }
   return (
     <Layout>
@@ -213,7 +227,7 @@ const Users = (props: any): JSX.Element => {
                           Edit
                       </button>
 
-                        <button type="button" className="btn btn-danger" >
+                        <button onClick={() => deleteUserById(user.id)} type="button" className="btn btn-danger" >
                           Delete
                       </button>
                       </td>

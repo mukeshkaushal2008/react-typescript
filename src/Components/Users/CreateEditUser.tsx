@@ -52,20 +52,22 @@ const CreateEditUser = (props: ComponentProps): JSX.Element => {
   const [canSubmitForm, setCanSubmitForm] = useState<boolean>(false);
   const [formSubmitLoader, setFormSubmitLoader] = useState<boolean>(false);
   const response: any = useSelector((state: AppState) => state.UserReducer);
+  const [formType, setFormType] = useState<string>('add');
+  const [userId, setUserId] = useState<number>(0);
 
   const handleChange = (e: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.currentTarget;
-    setPayload((payload: AddEditUserModel) => ({...payload, [name]: value }));
+    setPayload((payload: AddEditUserModel) => ({ ...payload, [name]: value }));
   }
   const handlePatientInfoChange = (e: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.currentTarget;
     setPayload((payload: AddEditUserModel) => ({
       ...payload,
-     patient_information: {
-      ...payload.patient_information,
-      [name]: value
-     }
-   }));
+      patient_information: {
+        ...payload.patient_information,
+        [name]: value
+      }
+    }));
   }
 
   const handleSubmit = (e: any): void => {
@@ -78,13 +80,19 @@ const CreateEditUser = (props: ComponentProps): JSX.Element => {
   useEffect((): void => {
     if (canSubmitForm == true) {
       setFormSubmitLoader(true);
-      dispatch(createUser(payload));
+      if (formType === 'add') {
+        dispatch(createUser(payload));
+      }
+      if (formType === 'edit') {
+        dispatch(editUser(payload, userId));
+      }
+
       setCanSubmitForm(false);
     }
   }, [canSubmitForm]);
 
   useEffect(() => {
-   
+
     if (response && response.payload && response.payload.status == 200) {
       if (response.action == "CREATE_USER") {
         setPayload(initialState());
@@ -92,22 +100,28 @@ const CreateEditUser = (props: ComponentProps): JSX.Element => {
         success('User Created Successfully');
         props.onAdd();
       }
+      if (response.action == "EDIT_USER") {
+        setFormSubmitLoader(false);
+        success('User Edited Successfully');
+        props.onAdd();
+      }
 
       if (response.action == "GET_USER_DETAIL") {
-        console.log(response.payload.data);
-        const {data}: any = response.payload;
-        let formData:AddEditUserModel = {
+
+        const { data }: any = response.payload;
+        let formData: AddEditUserModel = {
           firstname: data.firstname,
           lastname: data.lastname,
           email: data.email,
           user_image: '',
-          gender: null,
+          gender: data.gender,
           patient_information: {
-            insurance_provider: (data.patient_insurence  && data.patient_insurence.insurance_provider !== undefined) ? data.patient_insurence.insurance_provider : '',
-            policy_id: (data.patient_insurence  && data.patient_insurence.policy_id !== undefined)  ? data.patient_insurence.policy_id : '',
+            insurance_provider: (data.patient_insurence && data.patient_insurence.insurance_provider !== undefined) ? data.patient_insurence.insurance_provider : '',
+            policy_id: (data.patient_insurence && data.patient_insurence.policy_id !== undefined) ? data.patient_insurence.policy_id : '',
           }
         }
         setPayload(formData);
+        setFormSubmitLoader(false);
       }
 
     }
@@ -153,12 +167,14 @@ const CreateEditUser = (props: ComponentProps): JSX.Element => {
     }
   }, [props.show]);
 
-  
+
 
   useEffect((): void => {
     if (props.id) {
-      console.log('props.id', props.id);
-     dispatch(getUserDetail(props.id));
+      setFormType('edit');
+      setUserId(props.id);
+      setFormSubmitLoader(true);
+      dispatch(getUserDetail(props.id));
     }
   }, [props.id]);
   return (
@@ -167,9 +183,9 @@ const CreateEditUser = (props: ComponentProps): JSX.Element => {
       <ToastContainer />
 
       <Modal show={props.show} size="lg" aria-labelledby="contained-modal-title-vcenter" animation={false}>
-    
+
         <form onSubmit={handleSubmit}>
-          <Modal.Header closeButton>
+          <Modal.Header >
             <Modal.Title id="contained-modal-title-vcenter">
               Create New User
               </Modal.Title>
@@ -189,10 +205,10 @@ const CreateEditUser = (props: ComponentProps): JSX.Element => {
               </div>
             </div>
             <div className="form-check form-check-inline">
-            <FormInput checked={payload.gender == "1"  ? true : false } label="Gender" error={formErrors && formErrors.gender} onChange={handleChange} name="gender" value={1} type="radio" className="form-check-input" />Male
-            <FormInput checked={payload.gender == "2"  ? true : false }  error={formErrors && formErrors.gender} onChange={handleChange} name="gender" value={2} type="radio" className="form-check-input" />Female
+              <FormInput checked={payload.gender == "1" ? true : false} label="Gender" error={formErrors && formErrors.gender} onChange={handleChange} name="gender" value={1} type="radio" className="form-check-input" />Male
+            <FormInput checked={payload.gender == "2" ? true : false} error={formErrors && formErrors.gender} onChange={handleChange} name="gender" value={2} type="radio" className="form-check-input" />Female
             </div>
-           
+
 
             <div className="row">
               <div className="col col-md-6">
@@ -206,14 +222,14 @@ const CreateEditUser = (props: ComponentProps): JSX.Element => {
           <Modal.Footer>
             <Button variant="outline-secondary" onClick={props.onHide} type="button">
               Cancel
-      </Button>
+             </Button>
 
-      <button disabled={(formSubmitLoader) ? true : false} type="submit" className="btn btn-primary" >
-                  {formSubmitLoader && <Spinner animation="border" size="sm" />}
-                  {(formSubmitLoader) ? 'Processing' : 'Save'}
-                </button>
+            <button disabled={(formSubmitLoader) ? true : false} type="submit" className="btn btn-primary" >
+              {formSubmitLoader && <Spinner animation="border" size="sm" />}
+              {(formSubmitLoader) ? 'Processing' : 'Save'}
+            </button>
 
-          
+
           </Modal.Footer>
         </form>
       </Modal>

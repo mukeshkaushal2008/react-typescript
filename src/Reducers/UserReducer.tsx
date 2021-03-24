@@ -27,18 +27,24 @@ const UserReducer = (state = {}, action: any) => {
         payload: action.payload,
         action: "CREATE_USER",
       };
-     
+
     case 'EDIT_USER':
       return {
         payload: action.payload,
         action: "EDIT_USER",
-      }; 
-      case 'GET_USER_DETAIL':
+      };
+    case 'GET_USER_DETAIL':
       return {
         payload: action.payload,
         action: "GET_USER_DETAIL",
-      }; 
-      
+      };
+
+    case 'DELETE_USER':
+      return {
+        payload: action.payload,
+        action: "DELETE_USER",
+      };
+
     default:
       return state;
   }
