@@ -10,6 +10,7 @@ import { success, error } from '../../Utils/Toaster';
 import { AppState } from '../../Store';
 import { FormInput } from '../CommonComponents';
 import { Modal, Col, Button, Form, Spinner, Card, Accordion, Table } from 'react-bootstrap';
+import { Facebook, Instagram, List } from 'react-content-loader'
 
 export interface ComponentProps {
   show: boolean;
@@ -91,7 +92,7 @@ const CreateEditUser = (props: ComponentProps): JSX.Element => {
     }
   }, [canSubmitForm]);
 
-  useEffect(() => {
+  useEffect((): void => {
 
     if (response && response.payload && response.payload.status == 200) {
       if (response.action == "CREATE_USER") {
@@ -191,7 +192,16 @@ const CreateEditUser = (props: ComponentProps): JSX.Element => {
               </Modal.Title>
           </Modal.Header>
           <Modal.Body className="show-grid">
+            <div className="row">
+              <div className="col col-md-12">
+                {formSubmitLoader && <List />}
+              </div>
 
+            </div>
+
+
+            {!formSubmitLoader && 
+          <>
             <div className="row">
               <div className="col">
                 <FormInput label="First Name" error={formErrors && formErrors.firstname} onChange={handleChange} name="firstname" value={payload.firstname} type="text" className="form-control" />
@@ -218,6 +228,9 @@ const CreateEditUser = (props: ComponentProps): JSX.Element => {
                 <FormInput label="Policy Id" error={formErrors && formErrors.policy_id} onChange={handlePatientInfoChange} name="policy_id" value={payload.patient_information.policy_id} type="text" className="form-control" />
               </div>
             </div>
+            </>
+            }
+
           </Modal.Body>
           <Modal.Footer>
             <Button variant="outline-secondary" onClick={props.onHide} type="button">

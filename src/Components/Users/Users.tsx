@@ -10,6 +10,7 @@ import { success, error } from '../../Utils/Toaster';
 import { AppState } from '../../Store';
 import { Spinner } from 'react-bootstrap';
 import CreateEditUser from './CreateEditUser';
+import { Facebook } from 'react-content-loader'
 
 // import CreateUser from './CreateUser';
 const Users = (props: any): JSX.Element => {
@@ -136,20 +137,23 @@ const Users = (props: any): JSX.Element => {
   }
   return (
     <Layout>
-      <CreateEditUser id={userId}  onAdd={onAdd} show={modalShow} onHide={() => setModalShow(false)} />
-
-      <ToastContainer />
-      <div >
-        {/* <h3>Users: <CreateUser/></h3> */}
-        <>
-          {JSON.stringify(payload)}
-          {loading && <Loader
+     
+      {loading && <Loader
             type="Puff"
             color="#00BFFF"
             height={100}
             width={100}
             timeout={1000} //3 secs
           />}
+     
+      <CreateEditUser id={userId}  onAdd={onAdd} show={modalShow} onHide={() => setModalShow(false)} />
+
+      <ToastContainer />
+      <div >
+        {/* <h3>Users: <CreateUser/></h3> */}
+        <>
+         
+        
           <form onSubmit={handleSubmit}>
             <div className="row mb-3">
               <div className="col">
@@ -187,7 +191,7 @@ const Users = (props: any): JSX.Element => {
 
 
         </>
-
+       
         {
           <InfiniteScroll
             dataLength={currentPage}
@@ -209,7 +213,7 @@ const Users = (props: any): JSX.Element => {
               </thead>
               <tbody>
 
-
+             
                 {allUsers && allUsers.length > 0 ? (
                   allUsers.map((user, index) => (
 
@@ -237,7 +241,7 @@ const Users = (props: any): JSX.Element => {
                   ))
 
                 ) : (
-                  <tr>
+                 <tr>
                     <td colSpan={6} style={{ textAlign: 'center' }}>
                       No tasks found
                     </td>

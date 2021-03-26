@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Navbar, Spinner } from 'react-bootstrap'
+import { Spinner } from 'react-bootstrap'
 //import { logout, isLogin } from '../Middleware/Auth';
-import { Link, NavLink } from "react-router-dom";
 import { UserContext } from "../Hooks/UserContext";
 import { useHistory } from "react-router-dom";
 import { logout } from '../Actions/UserAction';
@@ -14,17 +13,10 @@ import NavBar from '../Layouts/NavBar';
 const Header: React.FC = (props): JSX.Element => {
     const dispatch = useDispatch();
     let history = useHistory();  // declare here, inside a React component. 
-
-    const [isLoggedIn, setIsLoggedIn] = useState<string>('');
-    const userContext: any = useContext(UserContext);
+    const isLoggedIn: boolean = useContext(UserContext);
     const response: any = useSelector((state: AppState) => state.UserReducer);
     const [logoutLoader, setLogoutLoader] = useState<boolean>(false);
-
-    // useEffect(() => setState(isLogin()), [props])
-    useEffect(() => {
-        console.log(userContext.isLoggedIn);
-        setIsLoggedIn(userContext.isLoggedIn);
-    }, []);
+    
     const handleLogout = (): void => {
         setLogoutLoader(true);
         dispatch(logout());
@@ -44,7 +36,6 @@ const Header: React.FC = (props): JSX.Element => {
             setLogoutLoader(false);
             if (response.payload.response && response.payload.response.data.status != 200) {
                 error(response.payload.response.data.message);
-                console.log('Component error', response)
             }
         }
 

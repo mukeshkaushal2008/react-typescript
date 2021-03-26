@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-export const UserContext = createContext(null);
+export const UserContext = createContext(false);
 // creating Provider and Consumer and exporting them.
 
 export const UserProvider = UserContext.Provider

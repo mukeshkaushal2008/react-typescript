@@ -1,7 +1,15 @@
 import * as React from 'react';
 import { InterfaceUserData, InterfaceUserResponse, InterfaceUserState } from '../Models/Users';
+import {getToken} from '../../src/Middlewares/Auth';
 
-const UserReducer = (state = {}, action: any) => {
+const user = getToken();
+
+const initialState = user
+  ? { isLoggedIn: true, user,  payload: null  }
+  : { isLoggedIn: false, payload: null };
+
+
+const UserReducer = (state = initialState, action: any) => {
 
   switch (action.type) {
     case 'USER_GET':
@@ -15,11 +23,13 @@ const UserReducer = (state = {}, action: any) => {
       return {
         payload: action.payload,
         action: "LOGIN",
+        isLoggedIn: true,
       };
     case 'LOGOUT':
       return {
         payload: action.payload,
         action: "LOGOUT",
+        isLoggedIn: false,
       };
 
     case 'CREATE_USER':
