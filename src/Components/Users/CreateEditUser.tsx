@@ -10,7 +10,7 @@ import { success, error } from '../../Utils/Toaster';
 import { AppState } from '../../Store';
 import { FormInput } from '../CommonComponents';
 import { Modal, Col, Button, Form, Spinner, Card, Accordion, Table } from 'react-bootstrap';
-import { Facebook, Instagram, List } from 'react-content-loader'
+import { CustomLoader } from '../CommonComponents/CustomLoader';
 
 export interface ComponentProps {
   show: boolean;
@@ -163,6 +163,7 @@ const CreateEditUser = (props: ComponentProps): JSX.Element => {
 
   useEffect((): void => {
     if (props.show == false) {
+      setFormType('');
       setFormErrors({});
       setPayload(initialState());
     }
@@ -181,54 +182,54 @@ const CreateEditUser = (props: ComponentProps): JSX.Element => {
   return (
 
     <React.Fragment>
-      <ToastContainer />
+
 
       <Modal show={props.show} size="lg" aria-labelledby="contained-modal-title-vcenter" animation={false}>
 
         <form onSubmit={handleSubmit}>
           <Modal.Header >
             <Modal.Title id="contained-modal-title-vcenter">
-              Create New User
+              {formType == 'edit' ? 'Edit': 'Create New' } User
               </Modal.Title>
           </Modal.Header>
           <Modal.Body className="show-grid">
             <div className="row">
               <div className="col col-md-12">
-                {formSubmitLoader && <List />}
+                <CustomLoader loading={formSubmitLoader} />
               </div>
 
             </div>
 
 
-            {!formSubmitLoader && 
-          <>
-            <div className="row">
-              <div className="col">
-                <FormInput label="First Name" error={formErrors && formErrors.firstname} onChange={handleChange} name="firstname" value={payload.firstname} type="text" className="form-control" />
-              </div>
-              <div className="col">
-                <FormInput label="Last Name" error={formErrors && formErrors.lastname} onChange={handleChange} name="lastname" value={payload.lastname} type="text" className="form-control" />
-              </div>
+            {!formSubmitLoader &&
+              <>
+                <div className="row">
+                  <div className="col">
+                    <FormInput label="First Name" error={formErrors && formErrors.firstname} onChange={handleChange} name="firstname" value={payload.firstname} type="text" className="form-control" />
+                  </div>
+                  <div className="col">
+                    <FormInput label="Last Name" error={formErrors && formErrors.lastname} onChange={handleChange} name="lastname" value={payload.lastname} type="text" className="form-control" />
+                  </div>
 
-              <div className="col">
-                <FormInput label="Email" error={formErrors && formErrors.email} onChange={handleChange} name="email" value={payload.email} type="text" className="form-control" />
-              </div>
-            </div>
-            <div className="form-check form-check-inline">
-              <FormInput checked={payload.gender == "1" ? true : false} label="Gender" error={formErrors && formErrors.gender} onChange={handleChange} name="gender" value={1} type="radio" className="form-check-input" />Male
+                  <div className="col">
+                    <FormInput label="Email" error={formErrors && formErrors.email} onChange={handleChange} name="email" value={payload.email} type="text" className="form-control" />
+                  </div>
+                </div>
+                <div className="form-check form-check-inline">
+                  <FormInput checked={payload.gender == "1" ? true : false} label="Gender" error={formErrors && formErrors.gender} onChange={handleChange} name="gender" value={1} type="radio" className="form-check-input" />Male
             <FormInput checked={payload.gender == "2" ? true : false} error={formErrors && formErrors.gender} onChange={handleChange} name="gender" value={2} type="radio" className="form-check-input" />Female
             </div>
 
 
-            <div className="row">
-              <div className="col col-md-6">
-                <FormInput label="Insurance provider" error={formErrors && formErrors.insurance_provider} onChange={handlePatientInfoChange} name="insurance_provider" value={payload.patient_information.insurance_provider} type="text" className="form-control" />
-              </div>
-              <div className="col col-md-6">
-                <FormInput label="Policy Id" error={formErrors && formErrors.policy_id} onChange={handlePatientInfoChange} name="policy_id" value={payload.patient_information.policy_id} type="text" className="form-control" />
-              </div>
-            </div>
-            </>
+                <div className="row">
+                  <div className="col col-md-6">
+                    <FormInput label="Insurance provider" error={formErrors && formErrors.insurance_provider} onChange={handlePatientInfoChange} name="insurance_provider" value={payload.patient_information.insurance_provider} type="text" className="form-control" />
+                  </div>
+                  <div className="col col-md-6">
+                    <FormInput label="Policy Id" error={formErrors && formErrors.policy_id} onChange={handlePatientInfoChange} name="policy_id" value={payload.patient_information.policy_id} type="text" className="form-control" />
+                  </div>
+                </div>
+              </>
             }
 
           </Modal.Body>

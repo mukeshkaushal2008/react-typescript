@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Spinner } from 'react-bootstrap'
-//import { logout, isLogin } from '../Middleware/Auth';
 import { UserContext } from "../Hooks/UserContext";
 import { useHistory } from "react-router-dom";
 import { logout } from '../Actions/UserAction';

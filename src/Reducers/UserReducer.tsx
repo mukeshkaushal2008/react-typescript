@@ -1,5 +1,3 @@
-import * as React from 'react';
-import { InterfaceUserData, InterfaceUserResponse, InterfaceUserState } from '../Models/Users';
 import {getToken} from '../../src/Middlewares/Auth';
 
 const user = getToken();

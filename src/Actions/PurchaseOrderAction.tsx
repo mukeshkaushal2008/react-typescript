@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Dispatch } from "redux";
 import { setToken, getToken } from '../Middlewares/Auth';
+import {objectToQuery} from '../Utils/Common';
 
 const apiUrl = `https://test.aestheticrecord.com/backend/api/`;
 
@@ -84,3 +85,30 @@ export const createSupplier = (formData: any) => {
     }
   }
 }
+
+
+
+export const getOrders = (formData: any) => {
+  return async (dispatch: Dispatch) => {
+    try {
+      const res = await axios.get(`${apiUrl}purchase-orders?${objectToQuery(formData)}`);
+      dispatch({ type: "GET_ORDERS", payload: res });
+      return res;
+    } catch (error) {
+      dispatch({ type: "GET_ORDERS", payload: error })
+    }
+  }
+}
+
+export const getDetail = (formData: any) => {
+  return async (dispatch: Dispatch) => {
+    try {
+      const res = await axios.get(`${apiUrl}get-purchase-order-details/${formData}`);
+      dispatch({ type: "GET_ORDER_DETAIL", payload: res });
+      return res;
+    } catch (error) {
+      dispatch({ type: "GET_ORDER_DETAIL", payload: error })
+    }
+  }
+}
+

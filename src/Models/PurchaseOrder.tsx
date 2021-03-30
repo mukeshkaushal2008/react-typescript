@@ -86,3 +86,18 @@ export interface AllClinicModel {
   clinic_id?: number | string;
   account_number?: string;
 }
+
+
+export interface PoComponentProps {
+  handleSubmit: () => void;
+  handleChange: () => void;
+  onSelect: () => void;
+  getOrderName: () => void;
+  initialPayloadState: ()=> void;
+  loadMore:() => void;
+}
+
+export interface Payload {
+  order_status?: string;
+  term?: string;
+}

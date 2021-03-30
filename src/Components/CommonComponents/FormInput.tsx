@@ -7,14 +7,14 @@ export interface FormInputProps {
   value: any,
   onChange: (value: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
   error?: string;
-  label?: string;
+  label?: boolean |string;
   style?: string;
   checked?: boolean;
 }
 
 
 
-const FormInput = (props: FormInputProps): JSX.Element => {
+const FormInput: React.FC<FormInputProps> = (props): JSX.Element => {
   let formClass:string;
   if(props.error !== undefined){
     formClass = `${props.className} input-error`;
@@ -24,7 +24,7 @@ const FormInput = (props: FormInputProps): JSX.Element => {
   }
   return (
     <React.Fragment>
-      <label htmlFor={props.name}>{props.label}</label>
+      { props.label !== false && <label htmlFor={props.name}>{props.label}</label>}
       <input
         id={props.name}
         name={props.name}
@@ -45,3 +45,4 @@ const FormInput = (props: FormInputProps): JSX.Element => {
 }
 
 export { FormInput };
+export default FormInput;

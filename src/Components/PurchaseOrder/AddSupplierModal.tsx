@@ -103,7 +103,7 @@ const AddSupplierModal = (props: any): JSX.Element => {
   }, [response]);
   return (
     <React.Fragment>
-       <ToastContainer />
+     
     
     <Modal size="lg" {...props} aria-labelledby="contained-modal-title-vcenter" animation={false}>
       

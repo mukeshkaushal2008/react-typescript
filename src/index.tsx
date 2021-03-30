@@ -1,17 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Provider } from 'react-redux';
 import store from './Store';
 import AppRouter from './Routes';
+import { ToastContainer } from 'react-toastify';
 
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
+    <ToastContainer />
+
       <AppRouter />
     </Provider>
   </React.StrictMode>,

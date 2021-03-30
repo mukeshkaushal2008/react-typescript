@@ -16,11 +16,11 @@ const NavBar: React.FC = (): JSX.Element => {
         <Link to="/login" className="nav-link" >Login</Link>
       </li>
 
-      {isLoggedIn && <li className={`nav-item ${pathname.startsWith('/create-order') ? 'active' : ''}`}>
-        <Link to="/create-order" className="nav-link" >Create Order</Link>
+      {isLoggedIn && <li className={`nav-item ${pathname.startsWith('/orders') ? 'active' : ''}`}>
+        <Link to="/orders" className="nav-link" >Orders</Link>
       </li>
       }
-
+       
       {isLoggedIn && <li className={`nav-item ${pathname.startsWith('/users') ? 'active' : ''}`}>
         <Link to="/users" className="nav-link" >Users</Link>
       </li>

@@ -345,7 +345,7 @@ const AddPurchaseOrder: React.FC = (): JSX.Element => {
   return (
     <div>
       <Layout>
-        <ToastContainer />
+      
        
         <AddSupplierModal onAdd={onSupplierAdd} countries={countries} clinics={clinicList} show={modalShow} onHide={() => setModalShow(false)} />
         <div className="container float-left">
