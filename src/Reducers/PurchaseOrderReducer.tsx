@@ -48,6 +48,13 @@ const PurchaseOrderReducer = (state = {}, action: any) => {
         action: "GET_ORDERS",
       };
 
+    case 'RECEIVE_ORDER':
+      return {
+        ...state,
+        payload: action.payload,
+        action: "RECEIVE_ORDER",
+      };
+
     default:
       return state;
   }

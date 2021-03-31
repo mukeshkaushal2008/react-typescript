@@ -94,7 +94,7 @@ const Login: React.FC = (props): JSX.Element => {
   return (
 
     <Layout>
-      <ToastContainer />
+      
       <div className="col-lg-8 offset-lg-2">
         <h2>Login</h2>
       

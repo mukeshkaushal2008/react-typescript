@@ -63,7 +63,7 @@ const AddSupplierModal = (props: any): JSX.Element => {
     if (props.countries) {
       setCountries(props.countries);
     }
-    if (props.clinics.length > 0) {
+    if (props.clinics && props.clinics.length > 0) {
       setAllClinics(props.clinics);
     }
   }, [props]);

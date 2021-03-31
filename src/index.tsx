@@ -6,14 +6,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Provider } from 'react-redux';
 import store from './Store';
 import AppRouter from './Routes';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, Zoom } from 'react-toastify';
 
 
 ReactDOM.render(
   <React.StrictMode>
+    <ToastContainer limit={1} transition={Zoom} />
     <Provider store={store}>
-    <ToastContainer />
-
       <AppRouter />
     </Provider>
   </React.StrictMode>,

@@ -112,3 +112,15 @@ export const getDetail = (formData: any) => {
   }
 }
 
+
+export const receiveOrder = (formData: any) => {
+  return async (dispatch: Dispatch) => {
+    try {
+      const res = await axios.post(`${apiUrl}add-received-items`, formData);
+      dispatch({ type: "RECEIVE_ORDER", payload: res });
+      return res;
+    } catch (error) {
+      dispatch({ type: "RECEIVE_ORDER", payload: error })
+    }
+  }
+}

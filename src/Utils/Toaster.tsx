@@ -14,6 +14,7 @@ const success = (msg: any) => {
 }
 
 const error = (msg: any) => {
+  console.log('Msg', msg)
   toast.error(msg, {
     position: "top-right",
     autoClose: 5000,

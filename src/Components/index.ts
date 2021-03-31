@@ -9,3 +9,4 @@ export { default as PurchaseOrderDetail } from "./PurchaseOrder/PurchaseOrderDet
 
 
 export { default as Login } from "./Auth/Login";
+export * from "./PurchaseOrder/ReceiveOrderModal";

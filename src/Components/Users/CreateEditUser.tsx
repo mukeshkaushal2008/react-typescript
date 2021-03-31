@@ -3,7 +3,6 @@ import { createUser, editUser, getUserDetail } from '../../Actions/UserAction';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import Loader from "react-loader-spinner";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
-import InfiniteScroll from 'react-infinite-scroll-component';
 import Layout from '../../Layouts/Layout';
 import { ToastContainer, toast } from 'react-toastify';
 import { success, error } from '../../Utils/Toaster';
@@ -31,7 +30,7 @@ export interface AddEditPatientModel {
   insurance_provider: string;
   policy_id: string;
 }
-const CreateEditUser = (props: ComponentProps): JSX.Element => {
+const CreateEditUser: React.FC<ComponentProps> = (props): JSX.Element => {
 
   const dispatch = useDispatch();
   const initialState = (): AddEditUserModel => {

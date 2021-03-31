@@ -7,7 +7,7 @@ import { success, error } from '../../Utils/Toaster';
 import { useHistory, useParams } from 'react-router-dom'
 import { NoRecordFound } from '../CommonComponents/NoRecordFound';
 import { CustomLoader } from '../CommonComponents/CustomLoader';
-
+import ReceiveOrderModal from '../PurchaseOrder/ReceiveOrderModal';
 const PurchaseOrderDetail: React.FC = (props): JSX.Element => {
   let params: any = useParams();
   const history = useHistory();
@@ -16,6 +16,10 @@ const PurchaseOrderDetail: React.FC = (props): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
   const [orderDetail, setOrderDetail] = useState<any>({});
   const [clinicOrderDetail, setClinicOrderDetail] = useState<any>({});
+  const [receiveOrderModalShow, setReceiveOrderModalShow] = useState<boolean>(false);
+  const [receiveOrderData, setReceiveOrderData] = useState<any>({});
+  const [clinicId, setClinicId] = useState<number>(0);
+
   useEffect((): void => {
     setLoading(true);
     dispatch(getDetail(params.id));
@@ -31,8 +35,6 @@ const PurchaseOrderDetail: React.FC = (props): JSX.Element => {
         setClinicOrderDetail(ReceivedPurchaseOrders);
         setLoading(false);
       }
-
-
     }
     if (response && response.payload && response.payload.isAxiosError) {
       setLoading(false);
@@ -42,17 +44,27 @@ const PurchaseOrderDetail: React.FC = (props): JSX.Element => {
     }
   }, [response]);
 
-  const getActions = () => {
+  const setModalData = (data: any, clinic_id: number) => {
+    setReceiveOrderData(data);
+    setReceiveOrderModalShow(true);
+    setClinicId(clinic_id);
+  }
 
+  const onAdd = (response: any) => {
+    let { PurchaseOrders, ReceivedPurchaseOrders } = response.payload.data;
+    setOrderDetail(PurchaseOrders);
+    setClinicOrderDetail(ReceivedPurchaseOrders);
   }
   return (<Layout>
+    <ReceiveOrderModal onAdd={onAdd} clinic_id={clinicId} data={receiveOrderData} show={receiveOrderModalShow} onHide={() => setReceiveOrderModalShow(false)} />
     <div className="container float-left">
 
 
       <div className="setting-setion mb-3">
 
         <div className="form-group col-md-12">
-          <h6>Purchase Order  PO#{orderDetail.po_number}</h6>
+          <h6 className="text-left">Purchase Order  PO#{orderDetail.po_number}</h6>
+          <button type="button" className="btn btn-success btn-sm text-right" onClick={() => history.push('/orders')}>Back</button>
         </div>
 
       </div>
@@ -84,7 +96,7 @@ const PurchaseOrderDetail: React.FC = (props): JSX.Element => {
             {(orderDetail.purchase_order_items && orderDetail.purchase_order_items.length > 0) ? (
               orderDetail.purchase_order_items.map((val: any, key: number) => (
                 <tr key={key}>
-                  <td scope="row" style={{wordBreak: 'break-word'}}>{(val.products && val.products !== undefined) ? val.products.product_name : ''}</td>
+                  <td scope="row" style={{ wordBreak: 'break-word' }}>{(val.products && val.products !== undefined) ? val.products.product_name : ''}</td>
                   <td>{(val.units && val.units !== undefined) ? val.units : '0'}</td>
                   <td>{(val.units_receivied && val.units_receivied !== undefined) ? val.units_receivied : '0'}</td>
                   <td>{(val.damage_units && val.damage_units !== undefined) ? val.damage_units : '0'}</td>
@@ -96,7 +108,7 @@ const PurchaseOrderDetail: React.FC = (props): JSX.Element => {
 
                     {(val.receiving_status && val.receiving_status == "full") ? 'Received' : (
                       <>
-                        <button type="button" className="btn btn-primary btn-sm" >
+                        <button onClick={() => setModalData(val, orderDetail.clinic_id)} type="button" className="btn btn-primary btn-sm mb-3" >
                           Receive
                    </button>
 
